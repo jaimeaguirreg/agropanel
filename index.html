@@ -46,13 +46,20 @@ p{margin:0}
 #portada[hidden],#app[hidden],.hoja[hidden],#cajon[hidden],#detalle[hidden],[data-solo][hidden]{display:none!important}
 
 /* ---------- portada ---------- */
-#portada{display:flex;flex-direction:column;align-items:center;gap:30px;padding:40px 16px 36px;text-align:center;min-height:100%}
-.productos{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px;width:min(860px,100%)}
-.producto-btn{font-family:var(--f-display);font-weight:600;font-size:14px;color:var(--azul-inst);background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:15px 10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;box-shadow:var(--shadow);transition:transform .12s ease,border-color .12s ease}
-.producto-btn:hover:not(:disabled){transform:translateY(-1px);border-color:var(--azul-govco)}
-.producto-btn.activo{background:var(--lima);border-color:#c4df00}
-.producto-btn small{font-family:var(--f-body);font-weight:500;font-size:11px;color:var(--ink-soft)}
-.producto-btn:disabled{cursor:not-allowed;color:var(--ink-faint);background:var(--surface-2);box-shadow:none}
+/* Solo las cajas de producto, a lo ancho y alto de la página, con el estilo de las tarjetas del Observatorio:
+   blancas, azul institucional, radio 14, sombra, suben al pasar el cursor. Apagadas = próximamente. */
+#portada{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;min-height:100vh}
+.productos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:1fr;gap:16px;width:100%;max-width:1320px;min-height:min(calc(100vh - 64px),900px)}
+@media (max-width:960px){.productos{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:760px){#portada{padding:20px 16px}.productos{gap:12px;min-height:0}.producto-btn{padding:16px 12px 12px}}
+.producto-btn{all:unset;box-sizing:border-box;min-height:120px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:14px;background:var(--surface);border:1px solid var(--border-soft);border-radius:14px;box-shadow:var(--shadow);padding:20px 20px 16px;text-align:center;transition:transform .12s ease,border-color .12s ease}
+.producto-btn:hover:not(:disabled){transform:translateY(-2px);border-color:var(--azul-govco)}
+.producto-btn:focus-visible{outline:2px solid var(--focus);outline-offset:3px}
+.producto-btn:disabled{cursor:not-allowed;background:var(--surface-2);box-shadow:none}
+.producto-nombre{flex:1;display:flex;align-items:center;justify-content:center;max-width:100%;font-family:var(--f-display);font-weight:700;font-size:clamp(26px,3vw,40px);line-height:1.1;color:var(--ink-fuerte);text-wrap:balance;overflow-wrap:break-word}
+.producto-btn:disabled .producto-nombre{color:var(--ink-faint)}
+.producto-pie{align-self:stretch;display:flex;align-items:center;justify-content:center;font-size:12.5px;color:var(--ink-faint);border-top:1px solid var(--border-soft);padding-top:10px}
+.producto-ir{font-weight:600;color:var(--azul-inst)}
 
 /* ---------- barra global ---------- */
 #nav-global{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;background:var(--azul-inst);padding:10px 20px}
@@ -518,7 +525,7 @@ function leyenda(el, series){ el.innerHTML = series.map(s => `<span style="--c:$
 // ---------------- portada y navegación ----------------
 function pintarPortada(){
   document.getElementById("productos-portada").innerHTML = D.productos.map(p =>
-    `<button type="button" class="producto-btn${p.activo?" activo":""}" data-producto="${p.clave}"${p.activo?"":" disabled"}>${p.nombre}<small>${p.activo?"Ver tablero":"Próximamente"}</small></button>`).join("");
+    `<button type="button" class="producto-btn${p.activo?" activo":""}" data-producto="${p.clave}"${p.activo?"":" disabled"}><span class="producto-nombre">${p.nombre}</span><span class="producto-pie">${p.activo?'<span class="producto-ir">Abrir →</span>':"<span>Próximamente</span>"}</span></button>`).join("");
   document.querySelectorAll(".producto-btn:not(:disabled)").forEach(b => b.addEventListener("click", () => abrirProducto(b.dataset.producto)));
   const sel = document.getElementById("producto");
   sel.innerHTML = D.productos.map(p => `<option value="${p.clave}"${p.activo?"":" disabled"}${p.clave==="arroz"?" selected":""}>${p.nombre}${p.activo?"":" · próximamente"}</option>`).join("");
